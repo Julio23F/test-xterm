@@ -1,0 +1,59 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Terminal Ubuntu</title>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@xterm/xterm/css/xterm.css" />
+    
+    <style>
+      body {
+        margin: 0;
+        background: #300a24;
+      }
+      #terminal {
+        height: 100vh;
+        padding: 10px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="terminal"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@xterm/xterm/lib/xterm.js"></script>
+
+    <script>
+      const term = new Terminal({
+        cursorBlink: true,
+        theme: {
+          background: '#300a24',
+          foreground: '#eeeeec',
+          cursor: '#ffffff'
+        }
+      });
+
+      term.open(document.getElementById('terminal'));
+
+      const socket = new WebSocket('ws://localhost:3000');
+
+      // recevoir données du serveur
+      socket.onmessage = (event) => {
+        term.write(event.data);
+      };
+
+      // envoyer frappe clavier au serveur
+      term.onData((data) => {
+        socket.send(data);
+      });
+
+      socket.onopen = () => {
+        term.write("Connected to real terminal\r\n");
+      };
+
+      socket.onerror = () => {
+        term.write("\r\nConnection error\r\n");
+      };
+    </script>
+  </body>
+</html>
